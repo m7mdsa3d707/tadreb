@@ -1,0 +1,19 @@
+<?php
+
+namespace App\Filament\Resources\Groubs\Pages;
+
+use App\Filament\Resources\Groubs\GroubsResource;
+use Filament\Actions\EditAction;
+use Filament\Resources\Pages\ViewRecord;
+
+class ViewGroubs extends ViewRecord
+{
+    protected static string $resource = GroubsResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            EditAction::make(),
+        ];
+    }
+}
