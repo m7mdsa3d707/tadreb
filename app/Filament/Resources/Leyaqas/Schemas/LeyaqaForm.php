@@ -22,6 +22,7 @@ class LeyaqaForm
                         ->afterStateUpdated(function ($state, callable $set) {
                        
                     //    dd(app(WorkoutScoreService::class)->calculate('pullups', 25, 8));
+                        dd(app(WorkoutScoreService::class)->calculate('pullups', 25, 8));
                        
                     }),
             ]);

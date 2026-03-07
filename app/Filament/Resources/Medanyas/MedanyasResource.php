@@ -5,6 +5,8 @@ namespace App\Filament\Resources\Medanyas;
 use App\Filament\Resources\Medanyas\Pages\CreateMedanyas;
 use App\Filament\Resources\Medanyas\Pages\EditMedanyas;
 use App\Filament\Resources\Medanyas\Pages\ListMedanyas;
+use App\Filament\Resources\Medanyas\Pages\MedanyaResults;
+use App\Filament\Resources\Medanyas\Pages\RunMedanyaTest;
 use App\Filament\Resources\Medanyas\Pages\ViewMedanyas;
 use App\Filament\Resources\Medanyas\Schemas\MedanyasForm;
 use App\Filament\Resources\Medanyas\Schemas\MedanyasInfolist;
@@ -55,6 +57,8 @@ class MedanyasResource extends Resource
             'create' => CreateMedanyas::route('/create'),
             'view' => ViewMedanyas::route('/{record}'),
             'edit' => EditMedanyas::route('/{record}/edit'),
+            'run-test' => RunMedanyaTest::route('/{record}/run-test'),
+            'results' => MedanyaResults::route('/{record}/results'),
         ];
     }
 }

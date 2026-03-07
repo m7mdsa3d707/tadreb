@@ -5,6 +5,9 @@ namespace App\Filament\Resources\Leyaqas\Pages;
 use App\Filament\Resources\Leyaqas\LeyaqaResource;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Resources\Pages\Page;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Form;
 
 class CreateMedanyaTest extends Page
 {
@@ -19,25 +22,25 @@ class CreateMedanyaTest extends Page
         $this->record = $this->resolveRecord($record);
     }
     public static function form(Form $form): Form
-{
-    return $form
-        ->schema([
-            Select::make('medanya_id')
-                ->relationship('medanya', 'name')
-                ->required(),
+    {
+        return $form
+            ->schema([
+                Select::make('medanya_id')
+                    ->relationship('medanya', 'name')
+                    ->required(),
 
-            Select::make('workout_type')
-                ->options([
-                    'pushup' => 'Push Up',
-                    'situp' => 'Sit Up',
-                    'pullup' => 'Pull Up',
-                    'running' => 'Running',
-                ])
-                ->required(),
+                Select::make('workout_type')
+                    ->options([
+                        'pushup' => 'Push Up',
+                        'situp' => 'Sit Up',
+                        'pullup' => 'Pull Up',
+                        'running' => 'Running',
+                    ])
+                    ->required(),
 
-            TextInput::make('score')
-                ->numeric()
-                ->required(),
-        ]);
-}
+                TextInput::make('score')
+                    ->numeric()
+                    ->required(),
+            ]);
+    }
 }
