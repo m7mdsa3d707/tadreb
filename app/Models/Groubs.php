@@ -15,7 +15,7 @@ class Groubs extends Model
     protected $guarded = ['id'];
     // protected $fillable = ['name'];
 
-    public function fogUsers() : HasMany
+    public function fogUsers(): HasMany
     {
         return $this->hasMany(FogUsers::class);
     }
