@@ -17,6 +17,6 @@ class Groubs extends Model
 
     public function fogUsers(): HasMany
     {
-        return $this->hasMany(FogUsers::class);
+        return $this->hasMany(FogUsers::class, 'groub_id', 'id');
     }
 }

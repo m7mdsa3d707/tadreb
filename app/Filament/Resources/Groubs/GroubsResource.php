@@ -9,6 +9,7 @@ use App\Filament\Resources\Groubs\Pages\ViewGroubs;
 use App\Filament\Resources\Groubs\Schemas\GroubsForm;
 use App\Filament\Resources\Groubs\Schemas\GroubsInfolist;
 use App\Filament\Resources\Groubs\Tables\GroubsTable;
+use App\Filament\Resources\Groubs\RelationManagers\FogUsersRelationManager;
 use App\Models\Groubs;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -42,7 +43,7 @@ class GroubsResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            FogUsersRelationManager::class,
         ];
     }
 

@@ -8,6 +8,7 @@ use App\Filament\Resources\Medanyas\Pages\ListMedanyas;
 use App\Filament\Resources\Medanyas\Pages\MedanyaResults;
 use App\Filament\Resources\Medanyas\Pages\RunMedanyaTest;
 use App\Filament\Resources\Medanyas\Pages\ViewMedanyas;
+use App\Filament\Resources\Medanyas\RelationManagers\FogUsersRelationManager;
 use App\Filament\Resources\Medanyas\Schemas\MedanyasForm;
 use App\Filament\Resources\Medanyas\Schemas\MedanyasInfolist;
 use App\Filament\Resources\Medanyas\Tables\MedanyasTable;
@@ -21,8 +22,8 @@ use Filament\Tables\Table;
 class MedanyasResource extends Resource
 {
     protected static ?string $model = Medanya::class;
-        protected static ?string $modelLabel = 'Medanya';
-        protected static ?string $pluralModelLabel = 'Medanyat';
+    protected static ?string $modelLabel = 'Medanya';
+    protected static ?string $pluralModelLabel = 'Medanyat';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTableCells;
 
@@ -46,7 +47,7 @@ class MedanyasResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            FogUsersRelationManager::class,
         ];
     }
 
