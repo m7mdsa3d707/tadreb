@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Filament\Resources\Medanyas\Pages;
 
 // use App\Filament\Resources\MedanyasResource;
@@ -31,20 +32,41 @@ class MedanyaResults extends Page
                 ->get()
                 ->keyBy('name');
 
-            $pushup = $tests['pushups']->score ?? 0;
-            $pullup = $tests['pullups']->score ?? 0;
-            $situp = $tests['situp']->score ?? 0;
-            $run = $tests['moderate_run']->score ?? 0;
+            $pushupScore = $tests['pushup']->score ?? 0;
+            $pullupScore = $tests['pullup']->score ?? 0;
+            $situpScore = $tests['situps']->score ?? 0;
+            $runScore = $tests['moderated_run']->score ?? 0;
 
-            $total = ($pushup + $pullup + $situp + $run) / 4;
+            // acculat data
+            $pushupNumber = $tests['pushup']->nubmer ?? 0;
+            $pullupNumber = $tests['pullup']->nubmer ?? 0;
+            $situpNumber = $tests['situps']->nubmer ?? 0;
+            $runNumber = $tests['moderated_run']->nubmer ?? 0;
+
+            $total = ($pushupScore + $pullupScore + $situpScore + $runScore) / 4;
 
             $this->results[] = [
                 'role' => $user->role,
                 'name' => $user->name,
-                'pushup' => $pushup,
-                'pullup' => $pullup,
-                'situp' => $situp,
-                'run' => $run,
+                'pushup' => [
+                    'score' => $pushupNumber,
+                    'result' => $pushupScore,
+                ],
+                'pullup' => [
+                    'score' => $pullupNumber,
+                    'result' => $pullupScore,
+                ],
+                'situp' => [
+                    'score' => $situpNumber,
+                    'result' => $situpScore,
+                ],
+                'run' => [
+                    'score' => $runNumber,
+                    'result' => $runScore,
+                ],
+                // 'pullup' => $pullupScore,
+                // 'situp' => $situpScore,
+                // 'run' => $runScore,
                 'total' => $total,
             ];
         }
@@ -55,7 +77,7 @@ class MedanyaResults extends Page
         return [
             Action::make('results')
                 ->label('View Results')
-                ->url(fn () => MedanyasResource::getUrl('results', [
+                ->url(fn() => MedanyasResource::getUrl('results', [
                     'record' => $this->record,
                 ]))
                 ->color('info'),

@@ -31,9 +31,8 @@ class RunMedanyaTest extends Page
 
         $users = $this->record->fogUsers;
 
-        foreach ($users as $user)
-            {
-                $this->data['users'][] = [
+        foreach ($users as $user) {
+            $this->data['users'][] = [
                 'user_id' => $user->id,
                 'name' => $user->name,
                 'role' => $user->role,
@@ -42,8 +41,8 @@ class RunMedanyaTest extends Page
                 'situp' => null,
                 'mod_run' => null,
             ];
-            }
-            $this->form->fill($this->data);
+        }
+        $this->form->fill($this->data);
     }
 
 
@@ -65,7 +64,7 @@ class RunMedanyaTest extends Page
 
             $user = FogUsers::find($item['user_id']);
 
-            foreach (['pushups','pullups','situp','moderate_run'] as $type) {
+            foreach (['pushup', 'pullup', 'situps', 'moderated_run'] as $type) {
 
                 $value = $item[$type] ?? 0;
                 $score = $service->calculate(
@@ -107,25 +106,25 @@ class RunMedanyaTest extends Page
 
                         TextEntry::make('name')
                             ->label('Name'),
-                        
-                        TextInput::make('pushups')
-                        ->numeric()
-                        ->placeholder('Enter pushups'),                            
 
-                        TextInput::make('pullups')
+                        TextInput::make('pushup')
+                            ->numeric()
+                            ->placeholder('Enter pushups'),
+
+                        TextInput::make('pullup')
                             ->numeric()
                             ->placeholder("Enter pullup"),
 
-                        TextInput::make('situp')
+                        TextInput::make('situps')
                             ->numeric()
                             ->placeholder("Enter situp"),
 
-                        TextInput::make('moderate_run')
+                        TextInput::make('moderated_run')
                             ->numeric()
                             ->placeholder("Enter moderate run"),
                     ])
                     ->columns(6),
-                    
+
             ])
             ->statePath('data');
     }

@@ -32,10 +32,10 @@ class workoutSeeder extends Seeder
 
 
         $workoutTypes = [
-            'push up' => 'pushup.json',
-            'pull up' => 'pullup.json',
+            'pushup' => 'pushup.json',
+            'pullup' => 'pullup.json',
             'situps' => 'situps.json',
-            'moderated run' => 'moderated-run.json',
+            'moderated_run' => 'moderated-run.json',
         ];
 
         foreach ($workoutTypes as $type => $filename) {
