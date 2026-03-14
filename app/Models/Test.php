@@ -12,13 +12,13 @@ class Test extends Model
     protected $guarded = ['id'];
 
 
-    public function user() : BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(FogUsers::class);
+        return $this->belongsTo(FogUsers::class, 'users_id', 'id');
     }
 
-     public function medanya() : BelongsTo
+    public function medanya(): BelongsTo
     {
-        return $this->belongsTo(Medanya::class);
+        return $this->belongsTo(Medanya::class, 'medanya_id', 'id');
     }
 }

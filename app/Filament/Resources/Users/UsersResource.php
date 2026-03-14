@@ -6,6 +6,7 @@ use App\Filament\Resources\Users\Pages\CreateUsers;
 use App\Filament\Resources\Users\Pages\EditUsers;
 use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Filament\Resources\Users\Pages\ViewUsers;
+use App\Filament\Resources\Users\RelationManagers\TestsRelationManager;
 use App\Filament\Resources\Users\Schemas\UsersForm;
 use App\Filament\Resources\Users\Schemas\UsersInfolist;
 use App\Filament\Resources\Users\Tables\UsersTable;
@@ -43,7 +44,7 @@ class UsersResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            TestsRelationManager::class
         ];
     }
 
