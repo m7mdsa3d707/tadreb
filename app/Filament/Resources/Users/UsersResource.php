@@ -52,9 +52,9 @@ class UsersResource extends Resource
     {
         return [
             'index' => ListUsers::route('/'),
-            'create' => CreateUsers::route('/create'),
+            // 'create' => CreateUsers::route('/create'),
             'view' => ViewUsers::route('/{record}'),
-            'edit' => EditUsers::route('/{record}/edit'),
+            // 'edit' => EditUsers::route('/{record}/edit'),
         ];
     }
 }

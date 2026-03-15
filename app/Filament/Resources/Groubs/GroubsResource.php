@@ -51,7 +51,7 @@ class GroubsResource extends Resource
     {
         return [
             'index' => ListGroubs::route('/'),
-            'create' => CreateGroubs::route('/create'),
+            // 'create' => CreateGroubs::route('/create'),
             'view' => ViewGroubs::route('/{record}'),
             'edit' => EditGroubs::route('/{record}/edit'),
         ];
