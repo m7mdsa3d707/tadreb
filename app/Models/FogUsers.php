@@ -12,19 +12,19 @@ class FogUsers extends Model
     protected $guarded = ['id'];
 
 
-    public function groub() : BelongsTo
+    public function groub(): BelongsTo
     {
         return $this->belongsTo(Groubs::class);
     }
 
 
-    public function medanya() : BelongsTo
+    public function medanya(): BelongsTo
     {
         return $this->belongsTo(Medanya::class);
     }
 
-    public function tests() : HasMany
+    public function tests(): HasMany
     {
-        return $this->hasMany(Test::class);
+        return $this->hasMany(Test::class, 'users_id', 'id');
     }
 }
