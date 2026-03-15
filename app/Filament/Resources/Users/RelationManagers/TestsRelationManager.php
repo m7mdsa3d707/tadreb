@@ -21,7 +21,7 @@ class TestsRelationManager extends RelationManager
 
     protected static ?string $title = 'Tests';
 
-    protected static ?string $relatedResource = UsersResource::class;
+    // protected static ?string $relatedResource = UsersResource::class;
 
 
 
@@ -30,12 +30,28 @@ class TestsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('name')
             ->columns([
-                // TextColumn::make('medanya.name')
-                //     ->label('Medanya')
-                //     ->searchable()
-                //     ->sortable(),
+                TextColumn::make('medanya.month')
+                    ->label('Medanya')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('name')
+                    ->label('Exercise')
+                    ->badge()
+                    ->sortable(),
+
+                TextColumn::make('nubmer')
+                    ->label('Count')
+                    ->sortable(),
+
+                TextColumn::make('score')
+                    ->label('Score %')
+                    ->sortable()
+                    ->formatStateUsing(fn($state) => round($state, 1) . '%')
+                    ->badge()
+                    ->color(fn($state) => $state >= 60 ? 'success' : 'danger'),
             ])
-            // ->defaultSort('medanya_id')
+            ->defaultSort('medanya_id')
+            ->defaultGroup('medanya.name')
             ->filters([])
             ->headerActions([]);
     }
