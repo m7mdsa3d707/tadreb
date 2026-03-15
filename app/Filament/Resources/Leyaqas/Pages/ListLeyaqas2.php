@@ -10,8 +10,10 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Schemas\Schema;
+use Filament\Actions\CreateAction;
+use Filament\Resources\Pages\ListRecords;
 
-class ListLeyaqas extends Page implements HasForms
+class ListLeyaqas2 extends Page implements HasForms
 {
     use InteractsWithForms;
 
@@ -69,7 +71,6 @@ class ListLeyaqas extends Page implements HasForms
 
         foreach ($medanyas as $medanya) {
             $rows = [];
-            $hasTests = Test::where('medanya_id', $medanya->id)->exists();
 
             foreach ($medanya->fogUsers as $user) {
                 $tests = Test::where('users_id', $user->id)
@@ -90,8 +91,8 @@ class ListLeyaqas extends Page implements HasForms
                 $total = ($pushupScore + $pullupScore + $situpScore + $runScore) / 4;
 
                 $rows[] = [
-                    'role'   => $user->role,
-                    'name'   => $user->name,
+                    'role' => $user->role,
+                    'name' => $user->name,
                     'pushup' => ['score' => $pushupNumber, 'result' => round($pushupScore, 1)],
                     'pullup' => ['score' => $pullupNumber, 'result' => round($pullupScore, 1)],
                     'situp'  => ['score' => $situpNumber,  'result' => round($situpScore,  1)],
@@ -101,10 +102,8 @@ class ListLeyaqas extends Page implements HasForms
             }
 
             $this->results[] = [
-                'medanya'    => $medanya->name,
-                'medanya_id' => $medanya->id,
-                'hasTests'   => $hasTests,
-                'rows'       => $rows,
+                'medanya' => $medanya->name,
+                'rows'    => $rows,
             ];
         }
     }
