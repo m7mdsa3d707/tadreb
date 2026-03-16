@@ -12,6 +12,7 @@ use App\Filament\Resources\Medanyas\RelationManagers\FogUsersRelationManager;
 use App\Filament\Resources\Medanyas\Schemas\MedanyasForm;
 use App\Filament\Resources\Medanyas\Schemas\MedanyasInfolist;
 use App\Filament\Resources\Medanyas\Tables\MedanyasTable;
+use App\Filament\Resources\Medanyas\Widgets\MedanyaWidget;
 use App\Models\Medanya;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -61,5 +62,12 @@ class MedanyasResource extends Resource
             'run-test' => RunMedanyaTest::route('/{record}/run-test'),
             'results' => MedanyaResults::route('/{record}/results'),
         ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            MedanyaWidget::class,
+            ];
     }
 }

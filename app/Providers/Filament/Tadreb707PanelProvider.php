@@ -2,6 +2,8 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Resources\Medanyas\Widgets\MedanyaWidget;
+use App\Filament\Resources\Users\Widgets\UserWidget;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -30,7 +32,17 @@ class Tadreb707PanelProvider extends PanelProvider
             ->login()
             ->colors([
                 'primary' => Color::Green,
+                // 'primary' => "#007AFF",
+                'secondary' => "#000000",
+                'success' => "#008000",
+                'danger' => "#FF0000",
+                'warning' => "#FFFF00",
+                'info' => "#008000",
+//                'gray' => "#000000",
+                'light' => "#FFFF00",
             ])
+            ->sidebarCollapsibleOnDesktop()
+             ->collapsedSidebarWidth('100')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([
@@ -40,6 +52,8 @@ class Tadreb707PanelProvider extends PanelProvider
             ->widgets([
                 // AccountWidget::class,
                 // FilamentInfoWidget::class,
+                UserWidget::class,
+                MedanyaWidget::class
             ])
             ->middleware([
                 EncryptCookies::class,

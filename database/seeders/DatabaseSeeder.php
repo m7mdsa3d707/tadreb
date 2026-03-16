@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         // $this->call([WorkoutScoreSeeder::class]);
-        $this->call([workoutSeeder::class]);
+        // $this->call([workoutSeeder::class]);
+        $this->call([UserSeeder::class]);
     }
 }

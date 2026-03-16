@@ -10,6 +10,7 @@ use App\Filament\Resources\Users\RelationManagers\TestsRelationManager;
 use App\Filament\Resources\Users\Schemas\UsersForm;
 use App\Filament\Resources\Users\Schemas\UsersInfolist;
 use App\Filament\Resources\Users\Tables\UsersTable;
+use App\Filament\Resources\Users\Widgets\UserWidget;
 use App\Models\FogUsers;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -56,5 +57,12 @@ class UsersResource extends Resource
             'view' => ViewUsers::route('/{record}'),
             // 'edit' => EditUsers::route('/{record}/edit'),
         ];
+    }
+
+     public static function getWidgets(): array
+    {
+        return [
+            UserWidget::class,
+            ];
     }
 }

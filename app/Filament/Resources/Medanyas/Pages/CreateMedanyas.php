@@ -16,7 +16,7 @@ class CreateMedanyas extends CreateRecord
     {
         $month = $data['month'];
 
-        $names = ['First', 'Second', 'Third', 'Fourth'];
+        $names = ['First Medanya', 'Second Medanya', 'Third Medanya', 'Fourth Medanya'];
 
         $first = null;
 

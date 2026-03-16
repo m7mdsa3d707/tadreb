@@ -1,0 +1,11 @@
+i have a project and i make the code that broke my idea 
+
+the code works fine but at some point i need to fix the logic
+
+i have 4 medanya in general each medanya has users and in each medanya there is a test contain some exercises and all logice of them are finishd and works fine
+
+i have leyaqa resource that is supposed to show the results of each medanya test and create tests too and i have this logicfinised 
+
+first i forgot and make the medanya have the column month too as the leyaqa first I need to remove month from medanya table and when creating new medanya i want to create 4 medanya in the leyaqa follow the same logic of medanya but for leyaqa and this is my current code before removing the month form medanya
+
+
