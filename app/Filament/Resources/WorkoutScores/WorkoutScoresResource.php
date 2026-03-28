@@ -20,7 +20,7 @@ class WorkoutScoresResource extends Resource
 {
     protected static ?string $model = WorkoutScore::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleGroup;
 
     protected static ?string $recordTitleAttribute = 'workout_type';
 

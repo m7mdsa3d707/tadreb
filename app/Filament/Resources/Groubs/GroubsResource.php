@@ -21,7 +21,7 @@ class GroubsResource extends Resource
 {
     protected static ?string $model = Groubs::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedEnvelope;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedEquals;
 
     protected static ?string $recordTitleAttribute = 'name';
 

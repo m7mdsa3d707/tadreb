@@ -3,6 +3,7 @@ namespace App\Filament\Resources\Leyaqas\Pages;
 
 use App\Filament\Resources\Leyaqas\LeyaqaResource;
 use App\Models\FogUsers;
+use App\Models\Leyaqa;
 use App\Models\Medanya;
 use App\Models\Test;
 use App\Services\WorkoutScoreService;
@@ -22,6 +23,7 @@ class RunMedanyaTest extends Page
 
     public array $data = [];
     public array $addUserData = [];
+    public int $leyaqaId;
     public int $medanyaId;
     public string $medanyaName = '';
 
@@ -29,17 +31,22 @@ class RunMedanyaTest extends Page
 
     public function mount(int $medanya): void
     {
-        $medanya = Medanya::findOrFail($medanya);
-        $this->medanyaId   = $medanya->id;
-        $this->medanyaName = $medanya->name;
+        $leyaqa = Leyaqa::findOrFail($medanya);
+        $this->leyaqaId   = $leyaqa->id;
+        $this->medanyaName = $leyaqa->name;
 
-        $this->loadUsers($medanya);
+        // $this->loadUsers($medanya);
+        // Get the permanent Medanya by name to load its users
+        $permanentMedanya = Medanya::where('name', $leyaqa->name)->firstOrFail();
+        $this->medanyaId  = $permanentMedanya->id;
+
+        $this->loadUsers($permanentMedanya, $leyaqa);
 
         $this->form->fill($this->data);
         $this->addUserForm->fill();
     }
 
-    protected function loadUsers(Medanya $medanya): void
+    protected function loadUsers(Medanya $medanya, Leyaqa $leyaqa): void
     {
         $existingIds = collect($this->data['users'] ?? [])->pluck('user_id')->toArray();
 
@@ -47,7 +54,7 @@ class RunMedanyaTest extends Page
             if (in_array($user->id, $existingIds)) continue;
 
             $existing = Test::where('users_id', $user->id)
-                ->where('medanya_id', $medanya->id)
+                ->where('leyaqa_id', $leyaqa->id)
                 ->get()
                 ->keyBy('name');
 
@@ -84,7 +91,7 @@ class RunMedanyaTest extends Page
         $user = FogUsers::findOrFail($userId);
 
         $existing = Test::where('users_id', $user->id)
-            ->where('medanya_id', $this->medanyaId)
+            ->where('leyaqa_id', $this->leyaqaId)
             ->get()
             ->keyBy('name');
 
@@ -98,6 +105,8 @@ class RunMedanyaTest extends Page
             'moderated_run' => $existing['moderated_run']->nubmer ?? null,
         ];
 
+        // $this->form->fill($this->data);
+        // $this->addUserForm->fill();
         $this->form->fill($this->data);
         $this->addUserForm->fill(); // reset the select
     }
@@ -109,7 +118,7 @@ class RunMedanyaTest extends Page
                 ->label('View Results')
                 ->color('info')
                 ->url(fn() => LeyaqaResource::getUrl('medanya-results', [
-                    'medanya' => $this->medanyaId,
+                    'medanya' => $this->leyaqaId,
                 ])),
 
             Action::make('saveTest')
@@ -119,36 +128,72 @@ class RunMedanyaTest extends Page
         ];
     }
 
+    // public function save(): void
+    // {
+    //     $service = app(WorkoutScoreService::class);
+
+    //     foreach ($this->data['users'] as $item) {
+    //         $user = FogUsers::find($item['user_id']);
+
+    //         foreach (['pushup', 'pullup', 'situps', 'moderated_run'] as $type) {
+    //             $value = $item[$type] ?? 0;
+    //             $score = $service->calculate($type, $user->age, $value);
+
+    //             Test::updateOrCreate(
+    //                 [
+    //                     'users_id'   => $user->id,
+    //                     'leyaqa_id' => $this->leyaqaId,
+    //                     'name'       => $type,
+    //                 ],
+    //                 [
+    //                     'nubmer' => $value,
+    //                     'score'  => $score,
+    //                 ]
+    //             );
+    //         }
+    //     }
+
+    //     Notification::make()
+    //         ->title('Test saved successfully')
+    //         ->success()
+    //         ->send();
+    // }
     public function save(): void
-    {
-        $service = app(WorkoutScoreService::class);
+{
+    $service = app(WorkoutScoreService::class);
 
-        foreach ($this->data['users'] as $item) {
-            $user = FogUsers::find($item['user_id']);
+    foreach ($this->data['users'] as $item) {
+        $userId = $item['user_id'] ?? null;
 
-            foreach (['pushup', 'pullup', 'situps', 'moderated_run'] as $type) {
-                $value = $item[$type] ?? 0;
-                $score = $service->calculate($type, $user->age, $value);
+        if (!$userId) continue; // ✅ skip if user_id is missing
 
-                Test::updateOrCreate(
-                    [
-                        'users_id'   => $user->id,
-                        'medanya_id' => $this->medanyaId,
-                        'name'       => $type,
-                    ],
-                    [
-                        'nubmer' => $value,
-                        'score'  => $score,
-                    ]
-                );
-            }
+        $user = FogUsers::find($userId);
+
+        if (!$user) continue; // ✅ skip if user not found
+
+        foreach (['pushup', 'pullup', 'situps', 'moderated_run'] as $type) {
+            $value = $item[$type] ?? 0;
+            $score = $service->calculate($type, $user->age, $value);
+
+            Test::updateOrCreate(
+                [
+                    'users_id'  => $user->id,
+                    'leyaqa_id' => $this->leyaqaId,
+                    'name'      => $type,
+                ],
+                [
+                    'nubmer' => $value,
+                    'score'  => $score,
+                ]
+            );
         }
-
-        Notification::make()
-            ->title('Test saved successfully')
-            ->success()
-            ->send();
     }
+
+    Notification::make()
+        ->title('Test saved successfully')
+        ->success()
+        ->send();
+}
 
     public function form(Schema $schema): Schema
     {

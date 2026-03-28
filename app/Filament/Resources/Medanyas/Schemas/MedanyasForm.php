@@ -27,6 +27,6 @@ class MedanyasForm
                         'November' => 'November',
                         'December' => 'December',
                     ]),
-            ]);
+            ]); // make it hidden on view
     }
 }

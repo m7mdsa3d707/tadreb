@@ -30,12 +30,13 @@ class TestsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('name')
             ->columns([
-                TextColumn::make('medanya.month')
-                    ->label('Medanya')
+                TextColumn::make('leyaqa.month')
+                    ->label('Leyaqa Test')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('name')
                     ->label('Exercise')
+                    ->searchable()
                     ->badge()
                     ->sortable(),
 
@@ -50,8 +51,8 @@ class TestsRelationManager extends RelationManager
                     ->badge()
                     ->color(fn($state) => $state >= 60 ? 'success' : 'danger'),
             ])
-            ->defaultSort('medanya_id')
-            ->defaultGroup('medanya.name')
+            ->defaultSort('leyaqa_id')
+            ->defaultGroup('leyaqa.name')
             ->filters([])
             ->headerActions([]);
     }

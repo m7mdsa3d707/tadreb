@@ -22,6 +22,10 @@ class FogUsers extends Model
     {
         return $this->belongsTo(Medanya::class);
     }
+    public function leyaqa(): BelongsTo
+    {
+        return $this->belongsTo(Leyaqa::class);
+    }
 
     public function tests(): HasMany
     {

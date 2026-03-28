@@ -21,4 +21,8 @@ class Test extends Model
     {
         return $this->belongsTo(Medanya::class, 'medanya_id', 'id');
     }
+    public function leyaqa(): BelongsTo
+    {
+        return $this->belongsTo(Leyaqa::class, 'leyaqa_id', 'id');
+    }
 }

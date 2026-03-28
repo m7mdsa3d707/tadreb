@@ -14,15 +14,20 @@ class UsersForm
     {
         return $schema
             ->components([
-                TextInput::make('name')->required(),
-                TextInput::make('age')->required(),
+                TextInput::make('name')
+                    ->required()
+                    ->columns(3),
+                TextInput::make('age')
+                    ->required()
+                    ->columns(3),
                 TextInput::make('role')->required(),
                 Select::make('groub_id')
                     ->label('Groub')
                     ->options(Groubs::all()->pluck('name', 'id'))
                     ->required()
                     ->visible(fn($record) => $record === null) // Only show when creating
-                    ->reactive(),
+                    ->reactive()
+                    ->columns(3),
                 // ->afterStateUpdated(function ($state, callable $set) {
                 //     $groub = Groubs::where('id', $state)->first();
                 //     // dd($groub->id);
@@ -38,6 +43,6 @@ class UsersForm
                     ->options(Medanya::all()->pluck('name', 'id'))
                     ->required()
                     ->reactive(),
-            ]);
+            ])->columns(4);
     }
 }

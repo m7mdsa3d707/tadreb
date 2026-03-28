@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Leyaqas\Pages;
 
 use App\Filament\Resources\Leyaqas\LeyaqaResource;
+use App\Models\Leyaqa;
 use App\Models\Medanya;
 use App\Models\Test;
 use Filament\Resources\Pages\Page;
@@ -63,49 +64,96 @@ class ListLeyaqas extends Page implements HasForms
 
         if (!$this->selectedMonth) return;
 
-        $medanyas = Medanya::where('month', $this->selectedMonth)
-            ->orderByRaw("FIELD(name, 'First', 'Second', 'Third', 'Fourth')")
+        $leyaqas = Leyaqa::where('month', $this->selectedMonth)
+            ->orderByRaw("FIELD(name, 'First Medanya', 'Second Medanya', 'Third Medanya', 'Fourth Medanya')")
             ->get();
 
-        foreach ($medanyas as $medanya) {
-            $rows = [];
-            $hasTests = Test::where('medanya_id', $medanya->id)->exists();
+       foreach ($leyaqas as $leyaqa) {
+        // Find the matching permanent Medanya by name to get its users and tests
+        $medanya = Medanya::where('name', $leyaqa->name)->first();
+        $hasTests = Test::where('leyaqa_id', $leyaqa->id)->exists();
 
-            foreach ($medanya->fogUsers as $user) {
-                $tests = Test::where('users_id', $user->id)
-                    ->where('medanya_id', $medanya->id)
-                    ->get()
-                    ->keyBy('name');
+        // if (!$medanya) continue;
 
-                $pushupScore  = $tests['pushup']->score         ?? 0;
-                $pullupScore  = $tests['pullup']->score         ?? 0;
-                $situpScore   = $tests['situps']->score         ?? 0;
-                $runScore     = $tests['moderated_run']->score  ?? 0;
+        $rows = [];
+        // $hasTests = Test::where('leyaqa_id', $medanya->id)->exists();
+        // dd($hasTests);
+        $allTests = Test::where('leyaqa_id', $leyaqa->id)
+            ->with('user')
+            ->get()
+            ->groupBy('users_id');
 
-                $pushupNumber = $tests['pushup']->nubmer        ?? 0;
-                $pullupNumber = $tests['pullup']->nubmer        ?? 0;
-                $situpNumber  = $tests['situps']->nubmer        ?? 0;
-                $runNumber    = $tests['moderated_run']->nubmer ?? 0;
+            foreach ($allTests as $userId => $userTests) {
+            $user       = $userTests->first()->user;
+            $keyedTests = $userTests->keyBy('name');
 
-                $total = ($pushupScore + $pullupScore + $situpScore + $runScore) / 4;
+            $pushupScore  = $keyedTests['pushup']->score         ?? 0;
+            $pullupScore  = $keyedTests['pullup']->score         ?? 0;
+            $situpScore   = $keyedTests['situps']->score         ?? 0;
+            $runScore     = $keyedTests['moderated_run']->score  ?? 0;
 
-                $rows[] = [
-                    'role'   => $user->role,
-                    'name'   => $user->name,
-                    'pushup' => ['score' => $pushupNumber, 'result' => round($pushupScore, 1)],
-                    'pullup' => ['score' => $pullupNumber, 'result' => round($pullupScore, 1)],
-                    'situp'  => ['score' => $situpNumber,  'result' => round($situpScore,  1)],
-                    'run'    => ['score' => $runNumber,    'result' => round($runScore,    1)],
-                    'total'  => round($total, 1),
-                ];
-            }
+            $pushupNumber = $keyedTests['pushup']->nubmer        ?? 0;
+            $pullupNumber = $keyedTests['pullup']->nubmer        ?? 0;
+            $situpNumber  = $keyedTests['situps']->nubmer        ?? 0;
+            $runNumber    = $keyedTests['moderated_run']->nubmer ?? 0;
 
-            $this->results[] = [
-                'medanya'    => $medanya->name,
-                'medanya_id' => $medanya->id,
-                'hasTests'   => $hasTests,
-                'rows'       => $rows,
+            $total = ($pushupScore + $pullupScore + $situpScore + $runScore) / 4;
+
+            $rows[] = [
+                'role'   => $user->role,
+                'name'   => $user->name,
+                'pushup' => ['score' => $pushupNumber, 'result' => round($pushupScore, 1)],
+                'pullup' => ['score' => $pullupNumber, 'result' => round($pullupScore, 1)],
+                'situp'  => ['score' => $situpNumber,  'result' => round($situpScore,  1)],
+                'run'    => ['score' => $runNumber,    'result' => round($runScore,    1)],
+                'total'  => round($total, 1),
             ];
         }
+
+        $this->results[] = [
+            'medanya'    => $leyaqa->name,
+            'medanya_id' => $leyaqa->id,  // ✅ blade uses this for URLs — point to leyaqa
+            'leyaqa_id'  => $leyaqa->id,
+            'hasTests'   => $hasTests,
+            'rows'       => $rows,
+        ];
+
+    //     foreach ($medanya->fogUsers as $user) {
+    //         $tests = Test::where('users_id', $user->id)
+    //             ->where('leyaqa_id', $leyaqa->id)
+    //             ->get()
+    //             ->keyBy('name');
+
+    //         $pushupScore  = $tests['pushup']->score         ?? 0;
+    //         $pullupScore  = $tests['pullup']->score         ?? 0;
+    //         $situpScore   = $tests['situps']->score         ?? 0;
+    //         $runScore     = $tests['moderated_run']->score  ?? 0;
+
+    //         $pushupNumber = $tests['pushup']->nubmer        ?? 0;
+    //         $pullupNumber = $tests['pullup']->nubmer        ?? 0;
+    //         $situpNumber  = $tests['situps']->nubmer        ?? 0;
+    //         $runNumber    = $tests['moderated_run']->nubmer ?? 0;
+
+    //         $total = ($pushupScore + $pullupScore + $situpScore + $runScore) / 4;
+
+    //         $rows[] = [
+    //             'role'   => $user->role,
+    //             'name'   => $user->name,
+    //             'pushup' => ['score' => $pushupNumber, 'result' => round($pushupScore, 1)],
+    //             'pullup' => ['score' => $pullupNumber, 'result' => round($pullupScore, 1)],
+    //             'situp'  => ['score' => $situpNumber,  'result' => round($situpScore,  1)],
+    //             'run'    => ['score' => $runNumber,    'result' => round($runScore,    1)],
+    //             'total'  => round($total, 1),
+    //         ];
+    //     }
+
+    //     $this->results[] = [
+    //         'medanya'    => $leyaqa->name,
+    //         'medanya_id' => $medanya->id,
+    //         'leyaqa_id' => $leyaqa->id,
+    //         'hasTests'   => $hasTests,
+    //         'rows'       => $rows,
+    //     ];
+    }
     }
 }

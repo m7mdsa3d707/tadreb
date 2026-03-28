@@ -26,7 +26,7 @@ class MedanyasResource extends Resource
     protected static ?string $modelLabel = 'Medanya';
     protected static ?string $pluralModelLabel = 'Medanyat';
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTableCells;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedQueueList;
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -59,15 +59,10 @@ class MedanyasResource extends Resource
             'create' => CreateMedanyas::route('/create'),
             'view' => ViewMedanyas::route('/{record}'),
             'edit' => EditMedanyas::route('/{record}/edit'),
-            'run-test' => RunMedanyaTest::route('/{record}/run-test'),
-            'results' => MedanyaResults::route('/{record}/results'),
+            // 'run-test' => RunMedanyaTest::route('/{record}/run-test'),
+            // 'results' => MedanyaResults::route('/{record}/results'),
         ];
     }
 
-    public static function getWidgets(): array
-    {
-        return [
-            MedanyaWidget::class,
-            ];
-    }
+
 }

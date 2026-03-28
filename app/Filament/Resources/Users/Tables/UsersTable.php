@@ -21,7 +21,7 @@ class UsersTable
             ->columns([
                     TextColumn::make('name')
                     ->searchable(query: function (Builder $query, string $search) {
-                            $query->where('name', 'like', "%{$search}%");
+                            $query->where('name', 'like', "%{$search}%" );
                         }),
                 TextColumn::make('medanya.name')
                

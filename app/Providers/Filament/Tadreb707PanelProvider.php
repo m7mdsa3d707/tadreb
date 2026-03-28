@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Resources\Leyaqas\Widgets\LeyaqaChart;
 use App\Filament\Resources\Medanyas\Widgets\MedanyaWidget;
 use App\Filament\Resources\Users\Widgets\UserWidget;
 use Filament\Http\Middleware\Authenticate;
@@ -53,7 +54,8 @@ class Tadreb707PanelProvider extends PanelProvider
                 // AccountWidget::class,
                 // FilamentInfoWidget::class,
                 UserWidget::class,
-                MedanyaWidget::class
+                MedanyaWidget::class,
+                // LeyaqaChart::class
             ])
             ->middleware([
                 EncryptCookies::class,
