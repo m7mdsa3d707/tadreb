@@ -27,6 +27,17 @@ class FogUsers extends Model
         return $this->belongsTo(Leyaqa::class);
     }
 
+    // public function dahyas(): HasMany
+    // {
+    //     return $this->hasMany(Dahya::class, 'fog_user_id');
+    // }
+
+    public function dahyaEntries(): HasMany
+    {
+        return $this->hasMany(DahyaEntry::class, 'fog_user_id');
+    }
+
+
     public function tests(): HasMany
     {
         return $this->hasMany(Test::class, 'users_id', 'id');
