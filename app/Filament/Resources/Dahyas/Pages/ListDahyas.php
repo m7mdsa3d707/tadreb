@@ -3,11 +3,14 @@
 namespace App\Filament\Resources\Dahyas\Pages;
 
 use App\Filament\Resources\Dahyas\DahyaResource;
+use App\Filament\Resources\Dahyas\Widgets\DahyaWedget;
 use App\Models\DahyaWeek;
-use Filament\Resources\Pages\Page;
+use Filament\Actions\Action;
+use Filament\Actions\CreateAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Resources\Pages\Page;
 use Filament\Schemas\Schema;
 
 class ListDahyas extends Page implements HasForms
@@ -64,5 +67,16 @@ class ListDahyas extends Page implements HasForms
                 'has_entries' => $w->entries()->whereNotNull('duration')->exists(),
             ])
             ->toArray();
+    }
+    
+    protected function getHeaderActions() : array {
+        return [
+            CreateAction::make()
+                ->color('info'),
+            // Action::make('Create New')
+            //     ->label('New Dahya')
+            //     ->color('info')
+                // ->url(fn() => DahyaResource::getUrl('create')),
+        ];
     }
 }

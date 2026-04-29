@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Resources\Dahyas\Widgets\DahyaWedget;
 use App\Filament\Resources\Leyaqas\Widgets\LeyaqaChart;
 use App\Filament\Resources\Medanyas\Widgets\MedanyaWidget;
 use App\Filament\Resources\Users\Widgets\UserWidget;
@@ -55,6 +56,7 @@ class Tadreb707PanelProvider extends PanelProvider
                 // FilamentInfoWidget::class,
                 UserWidget::class,
                 MedanyaWidget::class,
+                // DahyaWedget::class,
                 // LeyaqaChart::class
             ])
             ->middleware([

@@ -11,6 +11,7 @@ use App\Filament\Resources\Dahyas\Pages\ViewDahya;
 use App\Filament\Resources\Dahyas\Schemas\DahyaForm;
 use App\Filament\Resources\Dahyas\Schemas\DahyaInfolist;
 use App\Filament\Resources\Dahyas\Tables\DahyasTable;
+use App\Filament\Resources\Dahyas\Widgets\DahyaWedget;
 use App\Models\DahyaWeek;
 use BackedEnum;
 use Filament\Resources\Resource;

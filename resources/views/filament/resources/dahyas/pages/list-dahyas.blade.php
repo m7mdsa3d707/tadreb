@@ -1,18 +1,19 @@
 <x-filament::page>
 
+@livewire('dahya-month-stats')
     {{-- Month Selector --}}
     <div style="margin-bottom: 24px;">
         {{ $this->form }}
     </div>
 
     {{-- Create button --}}
-    <div style="margin-bottom: 20px;">
+    {{-- <div style="margin-bottom: 20px;">
         <a href="{{ \App\Filament\Resources\Dahyas\DahyaResource::getUrl('create') }}"
            style="padding: 8px 18px; background:#14532d; color:#86efac;
                   border-radius:6px; font-size:0.875rem; font-weight:600; text-decoration:none;">
             + Create 4 Weeks for Month
         </a>
-    </div>
+    </div> --}}
 
     @if (empty($weeks))
         <div style="text-align:center; padding:40px; color:#6b7280;">

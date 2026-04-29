@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Users\Pages;
 
+use App\Filament\Resources\Dahyas\Widgets\DahyaWedget;
 use App\Filament\Resources\Leyaqas\Widgets\LeyaqaChart;
 use App\Filament\Resources\Users\UsersResource;
 use Filament\Actions\DeleteAction;
@@ -23,6 +24,7 @@ class ViewUsers extends ViewRecord
     {
         return [
             // LeyaqaChart::class,
+            DahyaWedget::class
         ];
     }
 }

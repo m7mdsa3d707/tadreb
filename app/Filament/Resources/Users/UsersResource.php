@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Users;
 
+use App\Filament\Resources\Dahyas\Widgets\DahyaWedget;
 use App\Filament\Resources\Users\Pages\CreateUsers;
 use App\Filament\Resources\Users\Pages\EditUsers;
 use App\Filament\Resources\Users\Pages\ListUsers;
@@ -63,6 +64,7 @@ class UsersResource extends Resource
     {
         return [
             UserWidget::class,
+            DahyaWedget::class,
             ];
     }
 }
