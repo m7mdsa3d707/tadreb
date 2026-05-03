@@ -6,6 +6,7 @@ use App\Filament\Resources\Dahyas\Widgets\DahyaWedget;
 use App\Filament\Resources\Leyaqas\Widgets\LeyaqaChart;
 use App\Filament\Resources\Medanyas\Widgets\MedanyaWidget;
 use App\Filament\Resources\Users\Widgets\UserWidget;
+use App\Filament\Widgets\DahyaMonthStatsWidget;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -56,6 +57,7 @@ class Tadreb707PanelProvider extends PanelProvider
                 // FilamentInfoWidget::class,
                 UserWidget::class,
                 MedanyaWidget::class,
+                DahyaMonthStatsWidget::class,
                 // DahyaWedget::class,
                 // LeyaqaChart::class
             ])

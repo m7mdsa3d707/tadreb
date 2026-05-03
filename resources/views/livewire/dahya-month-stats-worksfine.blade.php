@@ -48,11 +48,11 @@
         @endforeach
     </div>
 
-    {{-- Overview Chart (bar + line) --}}
+    {{-- Overview Chart --}}
     <div style="background:#1f2937; border-radius:8px; padding:24px;
                 border:1px solid #374151; margin-bottom:32px;">
-        <h3 style="color:#f9fafb; font-size:0.875rem; font-weight:600;
-                   margin-bottom:16px; text-transform:uppercase; color:#9ca3af;">
+        <h3 style="color:#9ca3af; font-size:0.875rem; font-weight:600;
+                   text-transform:uppercase; margin-bottom:16px;">
             Weekly Overview
         </h3>
         <div wire:ignore>
@@ -64,7 +64,6 @@
     <div style="background:#1f2937; border-radius:8px; padding:24px;
                 border:1px solid #374151;">
 
-        {{-- Scope toggle --}}
         <div style="display:flex; align-items:center; justify-content:space-between;
                     margin-bottom:16px; flex-wrap:wrap; gap:8px;">
             <h3 style="color:#9ca3af; font-size:0.875rem; font-weight:600;
@@ -106,14 +105,10 @@
     let overviewInstance = null;
     let distInstance     = null;
 
-    function initOverviewChart() {
+    function buildOverviewChart(labels, avgSeconds, participants, minY, maxY) {
         const ctx = document.getElementById('dahya-overview-chart');
         if (!ctx) return;
         if (overviewInstance) { overviewInstance.destroy(); overviewInstance = null; }
-
-        const labels       = @json($overviewChart['labels'] ?? []);
-        const avgSeconds   = @json($overviewChart['avgSeconds'] ?? []);
-        const participants = @json($overviewChart['participants'] ?? []);
 
         overviewInstance = new Chart(ctx, {
             data: {
@@ -149,8 +144,8 @@
                     y: {
                         position: 'left',
                         reverse: true,
-                        min: @json($overviewChart['minY'] ?? 0),
-                        max: @json($overviewChart['maxY'] ?? 3600),
+                        min: minY,
+                        max: maxY,
                         title: { display: true, text: 'Avg Duration', color: '#9ca3af' },
                         ticks: {
                             color: '#9ca3af',
@@ -173,14 +168,14 @@
                     legend: { labels: { color: '#9ca3af' } },
                     tooltip: {
                         callbacks: {
-                            label: ctx => {
-                                if (ctx.dataset.yAxisID === 'y') {
-                                    var v = ctx.parsed.y;
+                            label: c => {
+                                if (c.dataset.yAxisID === 'y') {
+                                    var v = c.parsed.y;
                                     if (v === null) return 'No data';
                                     var m = Math.floor(v/60), s = v%60;
                                     return 'Avg: '+m+':'+(s<10?'0'+s:s);
                                 }
-                                return 'Participants: ' + ctx.parsed.y;
+                                return 'Participants: ' + c.parsed.y;
                             }
                         }
                     }
@@ -189,13 +184,10 @@
         });
     }
 
-    function initDistChart() {
+    function buildDistChart(labels, counts) {
         const ctx = document.getElementById('dahya-dist-chart');
         if (!ctx) return;
         if (distInstance) { distInstance.destroy(); distInstance = null; }
-
-        const labels = @json($distChart['labels'] ?? []);
-        const counts = @json($distChart['counts'] ?? []);
 
         distInstance = new Chart(ctx, {
             type: 'bar',
@@ -229,7 +221,7 @@
                     legend: { display: false },
                     tooltip: {
                         callbacks: {
-                            label: ctx => `${ctx.parsed.y} user(s) in ${ctx.label}–${ctx.label.replace(':00',':59')}`
+                            label: c => `${c.parsed.y} user(s) finished in ${c.label}`
                         }
                     }
                 },
@@ -237,14 +229,45 @@
         });
     }
 
-    function initAllCharts() {
-        initOverviewChart();
-        initDistChart();
-    }
+    // ✅ First load — after Livewire fully mounts all components
+    document.addEventListener('livewire:initialized', () => {
+        setTimeout(() => {
+            buildOverviewChart(
+                @json($overviewChart['labels']       ?? []),
+                @json($overviewChart['avgSeconds']   ?? []),
+                @json($overviewChart['participants'] ?? []),
+                @json($overviewChart['minY']         ?? 0),
+                @json($overviewChart['maxY']         ?? 3600)
+            );
+            buildDistChart(
+                @json($distChart['labels'] ?? []),
+                @json($distChart['counts'] ?? [])
+            );
+        }, 300);
+    });
 
-    document.addEventListener('DOMContentLoaded', initAllCharts);
-    document.addEventListener('livewire:navigated', initAllCharts);
+    document.addEventListener('livewire:initialized', () => console.log('livewire:initialized fired'));
+    document.addEventListener('livewire:init', () => console.log('livewire:init fired'));
+    document.addEventListener('livewire:load', () => console.log('livewire:load fired'));
+    document.addEventListener('DOMContentLoaded', () => console.log('DOMContentLoaded fired'));
+    window.addEventListener('load', () => console.log('window load fired'));
 
-    // Re-draw distribution chart when scope toggles (Livewire partial update)
-    document.addEventListener('livewire:update', () => setTimeout(initDistChart, 50));
+    // ✅ DEBUG — remove after fixing
+    document.addEventListener('livewire:initialized', () => {
+        console.log('livewire:initialized fired');
+        console.log('overviewChart data:', @json($overviewChart ?? []));
+        console.log('distChart data:', @json($distChart ?? []));
+        console.log('canvas exists:', document.getElementById('dahya-overview-chart'));
+    });
+
+    // ✅ Month/scope changes — redraw from events
+    document.addEventListener('livewire:init', () => {
+        Livewire.on('overviewChartUpdated', ({ labels, avgSeconds, participants, minY, maxY }) => {
+            setTimeout(() => buildOverviewChart(labels, avgSeconds, participants, minY, maxY), 300);
+        });
+
+        Livewire.on('distChartUpdated', ({ labels, counts }) => {
+            setTimeout(() => buildDistChart(labels, counts), 300);
+        });
+    });
 </script>
