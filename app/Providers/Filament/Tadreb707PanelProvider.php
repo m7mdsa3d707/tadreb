@@ -11,7 +11,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages\Dashboard;
+use App\Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -61,7 +61,7 @@ class Tadreb707PanelProvider extends PanelProvider
                 // FilamentInfoWidget::class,
                 UserWidget::class,
                 MedanyaWidget::class,
-                DahyaMonthStatsWidget::class,
+                // DahyaMonthStatsWidget::class,
                 // DahyaWedget::class,
                 // LeyaqaChart::class
             ])
