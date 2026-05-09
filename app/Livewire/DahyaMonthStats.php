@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\DahyaEntry;
 use App\Models\DahyaWeek;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
 class DahyaMonthStats extends Component
@@ -23,6 +24,21 @@ class DahyaMonthStats extends Component
         ->last();
 
     $this->selectedMonth = $latestMonth ?? now()->format('F');
+
+    // ✅ Initialize empty chart arrays (important for dashboard when no data)
+    $this->overviewChart = [
+        'labels'       => [],
+        'avgSeconds'   => [],
+        'participants' => [],
+        'minY'         => 0,
+        'maxY'         => 3600,
+    ];
+    $this->distChart = ['labels' => [], 'counts' => []];
+    $this->stats = [];
+    $this->weeks = [];
+        Log::info('DahyaMonthStats mounted', ['selectedMonth' => $this->selectedMonth ?? 'not set']);
+
+
     $this->loadData();
 }
 
@@ -39,59 +55,67 @@ class DahyaMonthStats extends Component
 
     public function loadData(): void
     {
-        $dahyaWeeks  = DahyaWeek::where('month', $this->selectedMonth)
+        $dahyaWeeks = DahyaWeek::where('month', $this->selectedMonth)
             ->orderBy('week_number')
             ->get();
 
+            
+            //  dd($dahyaWeeks->toArray(), $this->selectedMonth);
+
+        // ✅ Reset everything in case there are no weeks
         $this->weeks  = [];
         $this->stats  = [];
         $labels       = [];
         $avgSeconds   = [];
         $participants = [];
-       //dd($dahyaWeeks ); // didn't run
 
-        foreach ($dahyaWeeks  as $week) {
+        if ($dahyaWeeks->isEmpty()) {
+            // No data for this month – send empty chart structures
+            $this->overviewChart = [
+                'labels'       => [],
+                'avgSeconds'   => [],
+                'participants' => [],
+                'minY'         => 0,
+                'maxY'         => 3600,
+            ];
+            $this->distChart = ['labels' => [], 'counts' => []];
+            $this->dispatch('overviewChartUpdated', labels: [], avgSeconds: [], participants: [], minY: 0, maxY: 3600);
+            $this->dispatch('distChartUpdated', labels: [], counts: []);
+            return;
+        }
+
+        foreach ($dahyaWeeks as $week) {
             $entries = DahyaEntry::where('dahya_week_id', $week->id)
                 ->whereNotNull('duration')
                 ->get();
-                // dd($entries);
 
             $count = $entries->count();
-            // dd($count);
 
             $seconds = $entries->map(function ($e) {
                 $parts = explode(':', $e->duration);
                 return ((int)$parts[1] * 60) + (int)$parts[2];
             });
-            // dd($seconds);
 
             $avg = $count > 0 ? (int) round($seconds->average()) : null;
-            $avgFormatted = $avg
-                ? sprintf('%02d:%02d', floor($avg / 60), $avg % 60)
-                : '—';
+            $avgFormatted = $avg ? sprintf('%02d:%02d', floor($avg / 60), $avg % 60) : '—';
 
-                // dd($avg, $avgFormatted);
             $this->stats[] = [
                 'week'         => "Week {$week->week_number}",
                 'date'         => $week->date?->format('d M Y') ?? '—',
                 'participants' => $count,
                 'avg'          => $avgFormatted,
             ];
-            // dd($this->stats); // didn't run here
 
             $this->weeks[] = [
                 'id'     => $week->id,
                 'label'  => "Week {$week->week_number}",
             ];
-            // dd($this->weeks);
 
             $labels[]       = "W{$week->week_number}";
             $avgSeconds[]   = $avg ? (int) round($avg) : null;
             $participants[] = $count;
         }
-                // dd($this->weeks);// the problem is that the value didn't assigned to the array but it exist!!
 
-        // In loadData(), add min/max to overviewChart
         $allSeconds = collect($avgSeconds)->filter()->values();
 
         $this->overviewChart = [
@@ -101,33 +125,149 @@ class DahyaMonthStats extends Component
             'minY'         => $allSeconds->isNotEmpty() ? (int)(floor($allSeconds->min() / 60) * 60) - 60 : 0,
             'maxY'         => $allSeconds->isNotEmpty() ? (int)(ceil($allSeconds->max()  / 60) * 60) + 60 : 3600,
         ];
-        // dd($this->overviewChart);
 
         $this->loadDistribution();
 
-        logger('overviewChartUpdated fired', [
-            'labels'       => $labels,
-            'avgSeconds'   => $avgSeconds,
-            'participants' => $participants,
-            'minY'         => $allSeconds->isNotEmpty() ? (int)(floor($allSeconds->min() / 60) * 60) - 60 : 0,
-            'maxY'         => $allSeconds->isNotEmpty() ? (int)(ceil($allSeconds->max()  / 60) * 60) + 60 : 3600,
-        ]);
-        // ✅ dispatch event with fresh chart data
         $this->dispatch('overviewChartUpdated',
             labels:       $labels,
             avgSeconds:   $avgSeconds,
             participants: $participants,
-            minY:         $allSeconds->isNotEmpty() ? (int)(floor($allSeconds->min() / 60) * 60) - 60 : 0,
-            maxY:         $allSeconds->isNotEmpty() ? (int)(ceil($allSeconds->max()  / 60) * 60) + 60 : 3600,
+            minY:         $this->overviewChart['minY'],
+            maxY:         $this->overviewChart['maxY'],
         );
     }
+    // public function loadData(): void
+    // {
+    //     $dahyaWeeks  = DahyaWeek::where('month', $this->selectedMonth)
+    //         ->orderBy('week_number')
+    //         ->get();
+
+    //     $this->weeks  = [];
+    //     $this->stats  = [];
+    //     $labels       = [];
+    //     $avgSeconds   = [];
+    //     $participants = [];
+    //    //dd($dahyaWeeks ); // didn't run
+
+    //     foreach ($dahyaWeeks  as $week) {
+    //         $entries = DahyaEntry::where('dahya_week_id', $week->id)
+    //             ->whereNotNull('duration')
+    //             ->get();
+    //             // dd($entries);
+
+    //         $count = $entries->count();
+    //         // dd($count);
+
+    //         $seconds = $entries->map(function ($e) {
+    //             $parts = explode(':', $e->duration);
+    //             return ((int)$parts[1] * 60) + (int)$parts[2];
+    //         });
+    //         // dd($seconds);
+
+    //         $avg = $count > 0 ? (int) round($seconds->average()) : null;
+    //         $avgFormatted = $avg
+    //             ? sprintf('%02d:%02d', floor($avg / 60), $avg % 60)
+    //             : '—';
+
+    //             // dd($avg, $avgFormatted);
+    //         $this->stats[] = [
+    //             'week'         => "Week {$week->week_number}",
+    //             'date'         => $week->date?->format('d M Y') ?? '—',
+    //             'participants' => $count,
+    //             'avg'          => $avgFormatted,
+    //         ];
+    //         // dd($this->stats); // didn't run here
+
+    //         $this->weeks[] = [
+    //             'id'     => $week->id,
+    //             'label'  => "Week {$week->week_number}",
+    //         ];
+    //         // dd($this->weeks);
+
+    //         $labels[]       = "W{$week->week_number}";
+    //         $avgSeconds[]   = $avg ? (int) round($avg) : null;
+    //         $participants[] = $count;
+    //     }
+    //             // dd($this->weeks);// the problem is that the value didn't assigned to the array but it exist!!
+
+    //     // In loadData(), add min/max to overviewChart
+    //     $allSeconds = collect($avgSeconds)->filter()->values();
+
+    //     $this->overviewChart = [
+    //         'labels'       => $labels,
+    //         'avgSeconds'   => $avgSeconds,
+    //         'participants' => $participants,
+    //         'minY'         => $allSeconds->isNotEmpty() ? (int)(floor($allSeconds->min() / 60) * 60) - 60 : 0,
+    //         'maxY'         => $allSeconds->isNotEmpty() ? (int)(ceil($allSeconds->max()  / 60) * 60) + 60 : 3600,
+    //     ];
+    //     // dd($this->overviewChart);
+
+    //     $this->loadDistribution();
+
+    //     logger('overviewChartUpdated fired', [
+    //         'labels'       => $labels,
+    //         'avgSeconds'   => $avgSeconds,
+    //         'participants' => $participants,
+    //         'minY'         => $allSeconds->isNotEmpty() ? (int)(floor($allSeconds->min() / 60) * 60) - 60 : 0,
+    //         'maxY'         => $allSeconds->isNotEmpty() ? (int)(ceil($allSeconds->max()  / 60) * 60) + 60 : 3600,
+    //     ]);
+    //     // ✅ dispatch event with fresh chart data
+    //     $this->dispatch('overviewChartUpdated',
+    //         labels:       $labels,
+    //         avgSeconds:   $avgSeconds,
+    //         participants: $participants,
+    //         minY:         $allSeconds->isNotEmpty() ? (int)(floor($allSeconds->min() / 60) * 60) - 60 : 0,
+    //         maxY:         $allSeconds->isNotEmpty() ? (int)(ceil($allSeconds->max()  / 60) * 60) + 60 : 3600,
+    //     );
+    // }
+
+    // public function loadDistribution(): void
+    // {
+    //     // Get entries based on scope
+    //     if ($this->distributionScope === 'month') {
+    //         $weekIds = DahyaWeek::where('month', $this->selectedMonth)
+    //             ->pluck('id');
+    //         $entries = DahyaEntry::whereIn('dahya_week_id', $weekIds)
+    //             ->whereNotNull('duration')
+    //             ->get();
+    //     } else {
+    //         $entries = DahyaEntry::where('dahya_week_id', $this->distributionScope)
+    //             ->whereNotNull('duration')
+    //             ->get();
+    //     }
+
+    //     // Group by minute bucket
+    //     $buckets = [];
+    //     foreach ($entries as $entry) {
+    //         $parts      = explode(':', $entry->duration);
+    //         $totalSecs  = ((int)$parts[1] * 60) + (int)$parts[2];
+    //         $minuteSlot = floor($totalSecs / 60); // e.g. 23 = "23:00–23:59"
+    //         $label      = sprintf('%02d:00', $minuteSlot);
+    //         $buckets[$label] = ($buckets[$label] ?? 0) + 1;
+    //     }
+
+    //     // Sort by time
+    //     ksort($buckets);
+
+    //     $this->distChart = [
+    //     'labels' => array_keys($buckets),
+    //     'counts' => array_values($buckets),
+    //     ];
+
+        
+
+    //     // ✅ dispatch so JS re-draws
+    //     $this->dispatch('distChartUpdated',
+    //         labels: array_keys($buckets),
+    //         counts: array_values($buckets),
+    //     );
+
+    // }
 
     public function loadDistribution(): void
     {
-        // Get entries based on scope
         if ($this->distributionScope === 'month') {
-            $weekIds = DahyaWeek::where('month', $this->selectedMonth)
-                ->pluck('id');
+            $weekIds = DahyaWeek::where('month', $this->selectedMonth)->pluck('id');
             $entries = DahyaEntry::whereIn('dahya_week_id', $weekIds)
                 ->whereNotNull('duration')
                 ->get();
@@ -137,32 +277,26 @@ class DahyaMonthStats extends Component
                 ->get();
         }
 
-        // Group by minute bucket
         $buckets = [];
         foreach ($entries as $entry) {
             $parts      = explode(':', $entry->duration);
             $totalSecs  = ((int)$parts[1] * 60) + (int)$parts[2];
-            $minuteSlot = floor($totalSecs / 60); // e.g. 23 = "23:00–23:59"
+            $minuteSlot = floor($totalSecs / 60);
             $label      = sprintf('%02d:00', $minuteSlot);
             $buckets[$label] = ($buckets[$label] ?? 0) + 1;
         }
 
-        // Sort by time
         ksort($buckets);
 
         $this->distChart = [
-        'labels' => array_keys($buckets),
-        'counts' => array_values($buckets),
+            'labels' => array_keys($buckets),
+            'counts' => array_values($buckets),
         ];
 
-        
-
-        // ✅ dispatch so JS re-draws
         $this->dispatch('distChartUpdated',
             labels: array_keys($buckets),
             counts: array_values($buckets),
         );
-
     }
 
     public function render()

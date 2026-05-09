@@ -51,6 +51,10 @@ class Tadreb707PanelProvider extends PanelProvider
             ->pages([
                 Dashboard::class,
             ])
+            ->renderHook(
+                'panels::head.end',
+                fn() => '<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>',
+            )
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
                 // AccountWidget::class,
