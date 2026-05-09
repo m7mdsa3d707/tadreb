@@ -59,7 +59,7 @@
         {{-- <canvas id="dahya-overview-chart" height="100"></canvas> --}}
         {{-- Overview canvas --}}
         <canvas class="dahya-overview-chart" data-uid="{{ md5(uniqid()) }}" height="100"></canvas>
-        <p style="color:red;">Component ID: {{ $this->getId() }}</p>
+        {{-- <p style="color:red;">Component ID: {{ $this->getId() }}</p> --}}
     </div>
 
     <div style="background:#1f2937; border-radius:8px; padding:24px; border:1px solid #374151;">
@@ -90,7 +90,7 @@
         {{-- Dist canvas --}}  
         <canvas class="dahya-dist-chart" data-uid="{{ md5(uniqid()) }}" height="100"></canvas>
         
-<p style="color:red;">Overview canvas ID: overview-{{ $this->getId() }}</p>
+{{-- <p style="color:red;">Overview canvas ID: overview-{{ $this->getId() }}</p> --}}
     </div>
 
    {{-- Replace @once block with this --}}

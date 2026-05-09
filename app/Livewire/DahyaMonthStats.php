@@ -36,7 +36,7 @@ class DahyaMonthStats extends Component
     $this->distChart = ['labels' => [], 'counts' => []];
     $this->stats = [];
     $this->weeks = [];
-        Log::info('DahyaMonthStats mounted', ['selectedMonth' => $this->selectedMonth ?? 'not set']);
+        // Log::info('DahyaMonthStats mounted', ['selectedMonth' => $this->selectedMonth ?? 'not set']);
 
 
     $this->loadData();

@@ -1,250 +1,47 @@
-<div>
-    {{-- Month Selector --}}
-    <div style="margin-bottom: 24px;">
-        <select wire:model.live="selectedMonth"
-                style="padding:8px 12px; background:#111827; border:1px solid #374151;
-                       border-radius:6px; color:#f9fafb; font-size:0.875rem;">
-            @foreach(['January','February','March','April','May','June',
-                      'July','August','September','October','November','December'] as $m)
-                <option value="{{ $m }}" @selected($selectedMonth === $m)>{{ $m }}</option>
-            @endforeach
-        </select>
-    </div>
+<x-filament-widgets::widget>
+    <x-filament::section>
+        <x-slot name="heading">Dahya Progress</x-slot>
 
-    @if (empty($stats))
-        <div style="text-align:center; padding:40px; color:#6b7280;">
-            No dahya data for {{ $selectedMonth }}.
-        </div>
-    @else
+        <canvas
+            id="dahya-progress-{{ $this->getId() }}"
+            data-chart='@json($this->getData())'
+            data-options='@json($this->getOptions())'
+            height="120"
+        ></canvas>
+    </x-filament::section>
 
-    {{-- Stats Cards --}}
-    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
-                gap:16px; margin-bottom:32px;">
-        @foreach ($stats as $stat)
-        <div style="background:#1f2937; border-radius:8px; padding:16px;
-                    border-left:4px solid #f59e0b;">
-            <div style="font-size:0.75rem; color:#9ca3af; text-transform:uppercase;
-                        font-weight:600; margin-bottom:8px;">
-                {{ $stat['week'] }}
-                <span style="color:#6b7280; font-weight:400; margin-left:6px;">
-                    {{ $stat['date'] }}
-                </span>
-            </div>
-            <div style="display:flex; gap:24px; margin-top:4px;">
-                <div>
-                    <div style="font-size:1.5rem; font-weight:700; color:#f9fafb;">
-                        {{ $stat['participants'] }}
-                    </div>
-                    <div style="font-size:0.75rem; color:#6b7280;">Participants</div>
-                </div>
-                <div>
-                    <div style="font-size:1.5rem; font-weight:700; color:#3b82f6;">
-                        {{ $stat['avg'] }}
-                    </div>
-                    <div style="font-size:0.75rem; color:#6b7280;">Avg Time</div>
-                </div>
-            </div>
-        </div>
-        @endforeach
-    </div>
+    <script>
+    (function() {
+        const id      = 'dahya-progress-{{ $this->getId() }}';
+        const canvas  = document.getElementById(id);
+        if (!canvas) return;
 
-    {{-- Overview Chart (bar + line) --}}
-    <div style="background:#1f2937; border-radius:8px; padding:24px;
-                border:1px solid #374151; margin-bottom:32px;">
-        <h3 style="color:#f9fafb; font-size:0.875rem; font-weight:600;
-                   margin-bottom:16px; text-transform:uppercase; color:#9ca3af;">
-            Weekly Overview
-        </h3>
-        <div wire:ignore>
-            <canvas id="dahya-overview-chart" height="100"></canvas>
-        </div>
-    </div>
+        const chartData    = JSON.parse(canvas.dataset.chart);
+        const chartOptions = JSON.parse(canvas.dataset.options);
 
-    {{-- Distribution Chart --}}
-    <div style="background:#1f2937; border-radius:8px; padding:24px;
-                border:1px solid #374151;">
+        // Patch MM:SS callback back in
+        if (chartOptions.scales?.y?.ticks) {
+            chartOptions.scales.y.ticks.callback = function(value) {
+                var m = Math.floor(value / 60);
+                var s = value % 60;
+                return m + ':' + (s < 10 ? '0' + s : s);
+            };
+        }
 
-        {{-- Scope toggle --}}
-        <div style="display:flex; align-items:center; justify-content:space-between;
-                    margin-bottom:16px; flex-wrap:wrap; gap:8px;">
-            <h3 style="color:#9ca3af; font-size:0.875rem; font-weight:600;
-                       text-transform:uppercase; margin:0;">
-                Duration Distribution
-            </h3>
-            <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <button
-                    wire:click="$set('distributionScope', 'month')"
-                    style="padding:5px 12px; border-radius:6px; font-size:0.75rem;
-                           font-weight:600; cursor:pointer; border:none;
-                           background:{{ $distributionScope === 'month' ? '#3b82f6' : '#374151' }};
-                           color:{{ $distributionScope === 'month' ? '#fff' : '#9ca3af' }};">
-                    Whole Month
-                </button>
-                @foreach ($weeks as $week)
-                <button
-                    wire:click="$set('distributionScope', '{{ $week['id'] }}')"
-                    style="padding:5px 12px; border-radius:6px; font-size:0.75rem;
-                           font-weight:600; cursor:pointer; border:none;
-                           background:{{ $distributionScope == $week['id'] ? '#f59e0b' : '#374151' }};
-                           color:{{ $distributionScope == $week['id'] ? '#111827' : '#9ca3af' }};">
-                    {{ $week['label'] }}
-                </button>
-                @endforeach
-            </div>
-        </div>
+        function draw() {
+            if (typeof Chart === 'undefined') {
+                setTimeout(draw, 100);
+                return;
+            }
+            if (canvas._chart) canvas._chart.destroy();
+            canvas._chart = new Chart(canvas, {
+                type: 'line',
+                data: chartData,
+                options: chartOptions,
+            });
+        }
 
-        <div wire:ignore.self>
-            <canvas id="dahya-dist-chart" height="100"></canvas>
-        </div>
-    </div>
-
-    @endif
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    let overviewInstance = null;
-    let distInstance     = null;
-
-    function initOverviewChart() {
-        const ctx = document.getElementById('dahya-overview-chart');
-        if (!ctx) return;
-        if (overviewInstance) { overviewInstance.destroy(); overviewInstance = null; }
-
-        const labels       = @json($overviewChart['labels'] ?? []);
-        const avgSeconds   = @json($overviewChart['avgSeconds'] ?? []);
-        const participants = @json($overviewChart['participants'] ?? []);
-
-        overviewInstance = new Chart(ctx, {
-            data: {
-                labels,
-                datasets: [
-                    {
-                        type: 'bar',
-                        label: 'Participants',
-                        data: participants,
-                        backgroundColor: 'rgba(16,185,129,0.5)',
-                        borderColor: '#10b981',
-                        borderWidth: 1,
-                        yAxisID: 'y1',
-                    },
-                    {
-                        type: 'line',
-                        label: 'Avg Duration',
-                        data: avgSeconds,
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59,130,246,0.1)',
-                        tension: 0.4,
-                        pointRadius: 5,
-                        spanGaps: false,
-                        yAxisID: 'y',
-                    },
-                ],
-            },
-            options: {
-                responsive: true,
-                interaction: { mode: 'index', intersect: false },
-                scales: {
-                    x: { ticks: { color: '#9ca3af' }, grid: { color: '#374151' } },
-                    y: {
-                        position: 'left',
-                        reverse: true,
-                        min: @json($overviewChart['minY'] ?? 0),
-                        max: @json($overviewChart['maxY'] ?? 3600),
-                        title: { display: true, text: 'Avg Duration', color: '#9ca3af' },
-                        ticks: {
-                            color: '#9ca3af',
-                            stepSize: 60,
-                            callback: v => {
-                                var m = Math.floor(v/60), s = v%60;
-                                return m+':'+(s<10?'0'+s:s);
-                            }
-                        },
-                        grid: { color: '#374151' },
-                    },
-                    y1: {
-                        position: 'right',
-                        title: { display: true, text: 'Participants', color: '#9ca3af' },
-                        ticks: { color: '#9ca3af', stepSize: 1 },
-                        grid: { drawOnChartArea: false },
-                    },
-                },
-                plugins: {
-                    legend: { labels: { color: '#9ca3af' } },
-                    tooltip: {
-                        callbacks: {
-                            label: ctx => {
-                                if (ctx.dataset.yAxisID === 'y') {
-                                    var v = ctx.parsed.y;
-                                    if (v === null) return 'No data';
-                                    var m = Math.floor(v/60), s = v%60;
-                                    return 'Avg: '+m+':'+(s<10?'0'+s:s);
-                                }
-                                return 'Participants: ' + ctx.parsed.y;
-                            }
-                        }
-                    }
-                },
-            },
-        });
-    }
-
-    function initDistChart() {
-        const ctx = document.getElementById('dahya-dist-chart');
-        if (!ctx) return;
-        if (distInstance) { distInstance.destroy(); distInstance = null; }
-
-        const labels = @json($distChart['labels'] ?? []);
-        const counts = @json($distChart['counts'] ?? []);
-
-        distInstance = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels,
-                datasets: [{
-                    label: 'Users',
-                    data: counts,
-                    backgroundColor: 'rgba(245,158,11,0.6)',
-                    borderColor: '#f59e0b',
-                    borderWidth: 1,
-                    borderRadius: 4,
-                }],
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    x: {
-                        title: { display: true, text: 'Duration (MM:00)', color: '#9ca3af' },
-                        ticks: { color: '#9ca3af' },
-                        grid:  { color: '#374151' },
-                    },
-                    y: {
-                        title: { display: true, text: 'Number of Users', color: '#9ca3af' },
-                        ticks: { color: '#9ca3af', stepSize: 1 },
-                        grid:  { color: '#374151' },
-                        beginAtZero: true,
-                    },
-                },
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: ctx => `${ctx.parsed.y} user(s) in ${ctx.label}–${ctx.label.replace(':00',':59')}`
-                        }
-                    }
-                },
-            },
-        });
-    }
-
-    function initAllCharts() {
-        initOverviewChart();
-        initDistChart();
-    }
-
-    document.addEventListener('DOMContentLoaded', initAllCharts);
-    document.addEventListener('livewire:navigated', initAllCharts);
-
-    // Re-draw distribution chart when scope toggles (Livewire partial update)
-    document.addEventListener('livewire:update', () => setTimeout(initDistChart, 50));
-</script>
+        draw();
+    })();
+    </script>
+</x-filament-widgets::widget>
