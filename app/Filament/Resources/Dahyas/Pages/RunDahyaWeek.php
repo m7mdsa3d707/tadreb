@@ -21,13 +21,13 @@ class RunDahyaWeek extends Page implements HasForms
 
     protected static string $resource = DahyaResource::class;
     protected string $view = 'filament.resources.dahyas.pages.run-dahya-week';
-    
+
     public ?string $selectedUserId = null;
     public array $addUserData = [];
     public array $selectedUsers = [];
     public bool $selectAll = false;
     public array $data = [];
-    public array $users = []; 
+    public array $users = [];
     public int $weekId;
     public int $weekNumber;
     public string $month = '';
@@ -144,7 +144,7 @@ class RunDahyaWeek extends Page implements HasForms
 
             $mins = (int) ($item['duration_minutes'] ?? 0);
             $secs = (int) ($item['duration_seconds'] ?? 0);
-            
+
 
             // Store as "00:MM:SS" so MySQL time column accepts it
             $duration = sprintf('00:%02d:%02d', $mins, $secs);
@@ -153,11 +153,12 @@ class RunDahyaWeek extends Page implements HasForms
                 'dahya_week_id' => $this->weekId,
                 'fog_user_id'   => $fogUserId,
                 'duration'      => $duration, // ✅ was $item['duration']
-             ]);
+            ]);
         }
 
         Notification::make()
-            ->title('Week saved successfully')
+            // ->title('Week saved successfully')
+            ->title(__('Saved successfully'))
             ->success()
             ->send();
     }
@@ -221,7 +222,7 @@ class RunDahyaWeek extends Page implements HasForms
         //     'duration_seconds' => null,
         // ];
 
-        $this->users = array_merge($this->users ?? [], [[ 
+        $this->users = array_merge($this->users ?? [], [[
             'fog_user_id'      => $user->id,
             'name'             => $user->name,
             'role'             => $user->role,
@@ -233,7 +234,7 @@ class RunDahyaWeek extends Page implements HasForms
         $this->selectedUserId = null;
         $this->addUserForm->fill();
         // $this->dispatch('$refresh');
-        
+
 
         Notification::make()
             ->title('User added back')

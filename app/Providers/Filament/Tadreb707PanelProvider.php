@@ -23,6 +23,8 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use BezhanSalleh\LanguageSwitch\LanguageSwitch;
+
 
 class Tadreb707PanelProvider extends PanelProvider
 {
@@ -41,11 +43,11 @@ class Tadreb707PanelProvider extends PanelProvider
                 'danger' => "#FF0000",
                 'warning' => "#FFFF00",
                 'info' => "#008000",
-//                'gray' => "#000000",
+                //                'gray' => "#000000",
                 'light' => "#FFFF00",
             ])
             ->sidebarCollapsibleOnDesktop()
-             ->collapsedSidebarWidth('100')
+            ->collapsedSidebarWidth('100')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([
@@ -79,5 +81,14 @@ class Tadreb707PanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ]);
+    }
+
+    public function boot(): void
+    {
+        LanguageSwitch::configureUsing(function (LanguageSwitch $switch) {
+            $switch
+                ->locales(['en', 'ar'])
+                ->visible(outsidePanels: false);
+        });
     }
 }
