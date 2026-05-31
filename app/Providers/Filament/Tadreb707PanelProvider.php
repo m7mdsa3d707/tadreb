@@ -34,6 +34,7 @@ class Tadreb707PanelProvider extends PanelProvider
             ->default()
             ->id('tadreb707')
             ->path('tadreb707')
+            ->favicon(asset('brain.png'))
             ->login()
             ->colors([
                 'primary' => Color::Green,
