@@ -20,13 +20,22 @@ use Filament\Tables\Table;
 class LeyaqaResource extends Resource
 {
     protected static ?string $model = Leyaqa::class;
-    protected static ?string $modelLabel = 'Leyaqa';
-    protected static ?string $pluralModelLabel = 'Tamarin El Leyaqa';
+    // protected static ?string $modelLabel = 'Leyaqa';
+    // protected static ?string $pluralModelLabel = 'Tamarin El Leyaqa';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBolt;
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    public static function getModelLabel(): string
+    {
+        return __('Leyaqa');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Tamarin El Leyaqa');
+    }
     public static function form(Schema $schema): Schema
     {
         return LeyaqaForm::configure($schema);

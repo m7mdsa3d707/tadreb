@@ -157,8 +157,8 @@ class RunDahyaWeek extends Page implements HasForms
         }
 
         Notification::make()
-            // ->title('Week saved successfully')
-            ->title(__('Saved successfully'))
+            ->title('Week saved successfully')
+            // ->title(__('Saved successfully'))
             ->success()
             ->send();
     }
